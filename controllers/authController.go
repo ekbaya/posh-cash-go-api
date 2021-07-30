@@ -3,11 +3,10 @@ package controllers
 import (
 	"posh-pesa-api/database"
 	"posh-pesa-api/models"
-	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -31,7 +30,17 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	database.DB.Create(&user)
-	return c.JSON(user)
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"status":  "0",
+		"sucess":  "true",
+		"message": "User created",
+	})
+}
+
+func Profile(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"Message": "We are here",
+	})
 }
 
 func Login(c *fiber.Ctx) error {
@@ -62,20 +71,18 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.Id)),
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
-	})
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
 
-	token, err := claims.SignedString([]byte(SecreteKey))
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["id"] = user.Id
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte(SecreteKey))
 	if err != nil {
-		c.SendStatus(fiber.StatusInternalServerError)
-		return c.JSON(fiber.Map{
-			"sucess":  "false",
-			"status":  "1",
-			"message": "Could not login",
-		})
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	return c.JSON(fiber.Map{
@@ -83,6 +90,7 @@ func Login(c *fiber.Ctx) error {
 		"status":  "0",
 		"message": "Logged in sucessifully",
 		"user":    user,
-		"token":   token,
+		"token":   t,
 	})
+
 }
