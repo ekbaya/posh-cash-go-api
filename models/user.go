@@ -13,7 +13,7 @@ type User struct {
 	Idnumber         string `json:"id_number"`
 	Dob              string `json:"dob"`
 	Gender           string `json:"gender"`
-	MaritalStatus    string `json:"marital_status"`
+	MaritalStatus    string `json:"-"`
 	Address          string `json:"-"`
 	Latitude         string `json:"-"`
 	Longitude        string `json:"-"`
@@ -22,6 +22,6 @@ type User struct {
 	Comapny          string `json:"-"`
 	Position         string `json:"-"`
 	CompanyPhone     string `json:"-"`
-	IncomeRange      string `json:"income_range"`
+	IncomeRange      string `json:"-"`
 	LoginPin         []byte `json:"-" gorm:"default:null"`
 }

@@ -25,4 +25,7 @@ func Setup(app *fiber.App) {
 		SigningKey: []byte("secret"),
 	}))
 	app.Get("/api/user/profile", controllers.Profile)
+	app.Post("/api/user/profile/update-image", controllers.UpdateUserProfileImage)
+	app.Post("/api/user/income-range", controllers.CreateRange)
+	app.Post("/api/user/marital-status", controllers.CreateStatus)
 }

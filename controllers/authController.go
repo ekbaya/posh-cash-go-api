@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"posh-pesa-api/database"
 	"posh-pesa-api/models"
 	"strconv"
@@ -78,6 +79,12 @@ func Profile(c *fiber.Ctx) error {
 		})
 	}
 
+	var income models.Income
+	database.DB.Where("id = ?", user.IncomeRange).First(&income)
+
+	var maritalStatus models.MaritalStatus
+	database.DB.Where("id = ?", user.MaritalStatus).First(&maritalStatus)
+
 	address := models.Address{
 		Name:      user.Address,
 		Latitude:  user.Latitude,
@@ -95,9 +102,11 @@ func Profile(c *fiber.Ctx) error {
 		"success": "true",
 		"message": "user fetched successfully",
 		"data": fiber.Map{
-			"user":    user,
-			"address": address,
-			"company": company,
+			"user":           user,
+			"address":        address,
+			"company":        company,
+			"income":         income,
+			"marital_status": maritalStatus,
 		},
 	})
 }
@@ -144,6 +153,12 @@ func Login(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
+	var income models.Income
+	database.DB.Where("id = ?", user.IncomeRange).First(&income)
+
+	var maritalStatus models.MaritalStatus
+	database.DB.Where("id = ?", user.MaritalStatus).First(&maritalStatus)
+
 	address := models.Address{
 		Name:      user.Address,
 		Latitude:  user.Latitude,
@@ -161,13 +176,33 @@ func Login(c *fiber.Ctx) error {
 		"status":  "0",
 		"message": "Logged in sucessifully",
 		"data": fiber.Map{
-			"user":    user,
-			"address": address,
-			"company": company,
+			"user":           user,
+			"address":        address,
+			"company":        company,
+			"income":         income,
+			"marital_status": maritalStatus,
 		},
 		"token": t,
 	})
 
+}
+
+func UpdateUserProfileImage(c *fiber.Ctx) error {
+	file, err := c.FormFile("image")
+	if err != nil {
+		return c.Status(422).JSON(fiber.Map{"errors": [1]string{"Failed to update profile image"}})
+	}
+	c.SaveFile(file, fmt.Sprintf("./uploads/%s", file.Filename))
+
+	var user models.User
+	database.DB.Where("id = ?", ClientID(c)).First(&user)
+
+	database.DB.Model(&user).Update("image", file.Filename)
+	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
+		"status":  "0",
+		"sucess":  "true",
+		"message": "User updated successfully",
+	})
 }
 
 // Takes a
