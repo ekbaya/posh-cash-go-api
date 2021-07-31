@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -57,6 +58,16 @@ func Register(c *fiber.Ctx) error {
 		CompanyPhone:     data["company_phone"],
 		IncomeRange:      data["income_range"],
 	}
+
+	result, err := govalidator.ValidateStruct(user)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"stats":   "1",
+			"sucess":  "false",
+			"message": err.Error(),
+		})
+	}
+	println(result)
 
 	database.DB.Create(&user)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{

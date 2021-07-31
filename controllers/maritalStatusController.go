@@ -21,7 +21,7 @@ func CreateStatus(c *fiber.Ctx) error {
 	database.DB.Create(&maritalStatus)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"status":  "0",
-		"sucess":  "true",
+		"success": "true",
 		"message": "Marital status created successfully",
 	})
 }
