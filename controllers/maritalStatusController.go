@@ -25,3 +25,16 @@ func CreateStatus(c *fiber.Ctx) error {
 		"message": "Marital status created successfully",
 	})
 }
+
+func FetchMaitalStatuses(c *fiber.Ctx) error {
+	var marital_statuses []models.MaritalStatus
+
+	database.DB.Find(&marital_statuses)
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"status":  "0",
+		"sucess":  "true",
+		"message": "Marital statuses fetched sucessfully",
+		"data":    marital_statuses,
+	})
+}

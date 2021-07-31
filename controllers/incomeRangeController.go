@@ -25,3 +25,16 @@ func CreateRange(c *fiber.Ctx) error {
 		"message": "Income range created successfully",
 	})
 }
+
+func FetchIncomeRanges(c *fiber.Ctx) error {
+	var incomes []models.Income
+
+	database.DB.Find(&incomes)
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"status":  "0",
+		"sucess":  "true",
+		"message": "Income ranges fetched sucessfully",
+		"data":    incomes,
+	})
+}

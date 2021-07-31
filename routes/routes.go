@@ -11,6 +11,8 @@ func Setup(app *fiber.App) {
 	//public APIs
 	app.Post("/api/user/register", controllers.Register)
 	app.Post("/api/user/login", controllers.Login)
+	app.Get("/api/user/income-range", controllers.FetchIncomeRanges)
+	app.Get("/api/user/marital-status", controllers.FetchMaitalStatuses)
 
 	//Protected APIs
 	// JWT Middleware
