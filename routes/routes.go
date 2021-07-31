@@ -12,9 +12,16 @@ func Setup(app *fiber.App) {
 	app.Post("/api/user/register", controllers.Register)
 	app.Post("/api/user/login", controllers.Login)
 
-	//Protexted APIs
+	//Protected APIs
 	// JWT Middleware
 	app.Use(jwtware.New(jwtware.Config{
+		ErrorHandler: func(c *fiber.Ctx, e error) error {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"status":  "0",
+				"sucess":  "false",
+				"message": "Unauthorised Access",
+			})
+		},
 		SigningKey: []byte("secret"),
 	}))
 	app.Get("/api/user/profile", controllers.Profile)
